@@ -112,7 +112,7 @@ for scene in os.listdir(input_dir):
       file_image_list = os.path.join(move_full, 'lists', image_list)
 
       # export file
-      file_export = os.path.join(dir_results, image_list + ".sift.abc")
+      file_export_sift = os.path.join(dir_results, image_list + ".sift.abc")
 
       # statistics of evalQuality
 
@@ -131,7 +131,7 @@ for scene in os.listdir(input_dir):
       print('file_reconstruction_cctag : ' + file_reconstruction_cctag )
       print('dir_gt                    : ' + dir_gt                    )
       print('file_image_list           : ' + file_image_list           )
-      print('file_export               : ' + file_export               )
+      print('file_export_sift          : ' + file_export_sift          )
 
       command = os.path.join(OPENMVG_SFM_BIN, "openMVG_main_voctreeLocalizer") + ' \\\n'
       command += " -c " + file_calibration + ' \\\n'
@@ -140,7 +140,7 @@ for scene in os.listdir(input_dir):
       command += " -d " + file_reconstruction_sift + ' \\\n'
       command += " -s " + dir_matching_sift + ' \\\n'
       command += " -m " + file_image_list + ' \\\n'
-      command += " -e " + file_export
+      command += " -e " + file_export_sift
 
       print ('The following command will be executed :')
       print ( command )
@@ -150,7 +150,7 @@ for scene in os.listdir(input_dir):
 
 
       # export file
-      file_export = os.path.join(dir_results, image_list + ".cctag.abc")
+      file_export_cctag = os.path.join(dir_results, image_list + ".cctag.abc")
 
       # final command for CCTAG
       command = os.path.join(OPENMVG_SFM_BIN, "openMVG_main_cctagLocalizer") + '\\\n'
@@ -158,7 +158,7 @@ for scene in os.listdir(input_dir):
       command += " -d " + file_reconstruction_cctag + ' \\\n'
       command += " -s " + dir_matching_cctag + ' \\\n'
       command += " -m " + file_image_list + ' \\\n'
-      command += " -e " + file_export
+      command += " -e " + file_export_cctag
 
       print ('The following command will be executed :')
       print ( command )
