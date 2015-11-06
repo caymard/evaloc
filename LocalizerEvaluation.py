@@ -84,8 +84,6 @@ if(args.fake_flag):
 for scene in os.listdir(input_dir):
   scene_full = os.path.join(input_dir, scene)
 
-  # calibration file
-  file_calibration = os.path.join(scene_full, "camera.cal")
   # voctree + weights
   file_voctree = os.path.join(scene_full, "voctree.tree")
   file_weights = os.path.join(scene_full, "weights.weights")
@@ -99,6 +97,9 @@ for scene in os.listdir(input_dir):
   # we enter in a movement
   for move in os.listdir(os.path.join(scene_full, 'moves')):
     move_full = os.path.join(scene_full, 'moves', move)
+
+    # calibration file
+    file_calibration = os.path.join(move_full, 'camera.cal')
 
     # ground truth
     dir_gt = os.path.join(move_full, 'gt')
