@@ -108,6 +108,10 @@ for scene in os.listdir(input_dir):
     dir_results = os.path.join('results', scene, move)
     mkdir_p(dir_results)
 
+    # evaluation directory
+    dir_eval = os.path.join('eval', scene, move)
+    mkdir_p(dir_eval)
+
     # for each image list we perform the tracking (SIFT or CCTAG or both, depending on option TODO)
     for image_list in os.listdir( os.path.join(move_full, 'lists') ):
       file_image_list = os.path.join(move_full, 'lists', image_list)
@@ -160,6 +164,36 @@ for scene in os.listdir(input_dir):
       command += " -s " + dir_matching_cctag + ' \\\n'
       command += " -m " + file_image_list + ' \\\n'
       command += " -e " + file_export_cctag
+
+      print ('The following command will be executed :')
+      print ( command )
+      if(not fake_flag):
+        proc = subprocess.Popen((str(command)), shell=True)
+        proc.wait()
+
+
+      # ground truth comparaison
+      print ('SIFT and CCTag localizations are done. The ground truth evaluation will now perform :')
+
+      # for SIFT
+      print ('Evaluation for SIFT localization:')
+      command = os.path.join(OPENMVG_SFM_BIN, "openMVG_main_evalQuality") + '\\\n'
+      command += " -i " + dir_gt + '\\\n'
+      command += " -c " + file_export_sift + '\\\n'
+      command += " -o " + os.path.join(dir_eval, image_list + "_sift")
+
+      print ('The following command will be executed :')
+      print ( command )
+      if(not fake_flag):
+        proc = subprocess.Popen((str(command)), shell=True)
+        proc.wait()
+
+      # for CCTAG
+      print ('Evaluation for CCTAG localization:')
+      command = os.path.join(OPENMVG_SFM_BIN, "openMVG_main_evalQuality") + '\\\n'
+      command += " -i " + dir_gt + '\\\n'
+      command += " -c " + file_export_cctag + '\\\n'
+      command += " -o " + os.path.join(dir_eval, image_list + "_cctag")
 
       print ('The following command will be executed :')
       print ( command )
