@@ -171,7 +171,7 @@ for scene in os.listdir(input_dir):
         proc.wait()
 
 
-      # ground truth comparaison
+      # ground truth evaluation
       print ('SIFT and CCTag localizations are done. The ground truth evaluation will now perform :')
 
       # for SIFT
@@ -197,7 +197,7 @@ for scene in os.listdir(input_dir):
       print ('The following command will be executed :')
       print ( command )
       if(not fake_flag):
-        proc = subprocess.Popen((str(command)), shell=True)
+        proc = subprocess.Popen((str(command)), shell=True, stdout=subprocess.PIPE)
         proc.wait()
 
 
