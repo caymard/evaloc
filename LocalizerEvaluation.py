@@ -43,16 +43,10 @@ parser = argparse.ArgumentParser(description='Run OpenMVG localization on severa
 parser.add_argument('-s', '--software', required=True, help='OpenMVG SfM software bin folder', metavar='SOFTWARE_PATH')
 # input folder where datasets are stored
 parser.add_argument('-i', '--input', required=True, help='Folder of the dataset', metavar='DATASETS_PATH')
-# # camera calibration
-# parser.add_argument('-c', '--calibration', required=True, help='Camera calibration')
-# # voctree
-# parser.add_argument('-t', '--voctree', required=True, help='Vocabulary tree')
-# # weights
-# parser.add_argument('-w', '--weights', required=True, help='Vocabulary tree weights')
-# # Output file
-# parser.add_argument('-o', '--output', default='trackedcameras.abc', help='Ouput Alembic files containing estimated camera poses', metavar='RECONSTRUCTIONS_PATH')
-# Result file
-parser.add_argument('-r', '--result', default='results.json', help='Directory to store the results', metavar='RESULT_VAR')
+# Results folder
+parser.add_argument('-r', '--result', default='results', help='Directory to store the results', metavar='RESULT_PATH')
+# Evaluation folder
+parser.add_argument('-e', '--evaluation', default='evalutations', help='Directory to store evaluation files', metavar='EVALUATION_PATH')
 # fake flag
 parser.add_argument('-f', dest='fake_flag', action='store_true', help='Print the commands without executing them')
 parser.set_defaults(fake_flag=False)
@@ -66,14 +60,11 @@ if not (os.path.exists(OPENMVG_SFM_BIN)):
   sys.exit(1)
 
 input_dir = args.input
+dir_results_base = args.result
+dir_eval_base = args.evaluation
 fake_flag = args.fake_flag
 if(fake_flag):
   print "Fake flag activated. Nothing will be executed."
-
-# camera_calib   = args.calibration
-# voctree        = args.voctree
-# weights         = args.weights
-# output_file    = args.output
 
 # Run for each dataset of the input eval dir perform
 #  . localization
@@ -104,11 +95,11 @@ for scene in os.listdir(input_dir):
     dir_gt = os.path.join(move_full, 'gt')
 
     # result directory
-    dir_results = os.path.join('results', scene, move)
+    dir_results = os.path.join(dir_results_base, scene, move)
     mkdir_p(dir_results)
 
     # evaluation directory
-    dir_eval = os.path.join('eval', scene, move)
+    dir_eval = os.path.join(dir_eval_base, scene, move)
     mkdir_p(dir_eval)
 
     # for each image list we perform the tracking (SIFT or CCTAG or both, depending on option TODO)
