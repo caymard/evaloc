@@ -68,9 +68,8 @@ if not (os.path.exists(OPENMVG_SFM_BIN)):
 input_dir = args.input
 fake_flag = args.fake_flag
 if(fake_flag):
-  print "fake"
-if(args.fake_flag):
-  print "fake flag"
+  print "Fake flag activated. Nothing will be executed."
+  
 # camera_calib   = args.calibration
 # voctree        = args.voctree
 # weights         = args.weights
