@@ -4,11 +4,6 @@
 # this script is to evaluate the Incremental SfM pipeline to a known camera trajectory
 # Notes:
 #  - OpenMVG 0.8 is required
-#
-# Usage:
-#  $ 
-#
-#
 
 import commands
 import os
@@ -40,41 +35,30 @@ def ensure_dir(f):
 parser = argparse.ArgumentParser(description='Run OpenMVG localization on several datasets to evaluate the localization according to a ground truth.')
 
 # OpenMVG SfM programs
-parser.add_argument('-s', '--software', required=True, help='OpenMVG SfM software folder ( like [...]/build/software/SfM)', metavar='SOFTWARE_PATH')
+parser.add_argument('-s', '--software', required=True, help='OpenMVG SfM software bin folder', metavar='SOFTWARE_PATH')
 # input folder where datasets are stored
-parser.add_argument('-i', '--input', required=True, help='Folder of the dataset)', metavar='DATASETS_PATH')
-# # camera calibration
-# parser.add_argument('-c', '--calibration', required=True, help='Camera calibration')
-# # voctree
-# parser.add_argument('-t', '--voctree', required=True, help='Vocabulary tree')
-# # weights
-# parser.add_argument('-w', '--weights', required=True, help='Vocabulary tree weights')
-# # Output file
-# parser.add_argument('-o', '--output', default='trackedcameras.abc', help='Ouput Alembic files containing estimated camera poses', metavar='RECONSTRUCTIONS_PATH')
-# Result file
-parser.add_argument('-r', '--result', default='results.json', help='File to store the results', metavar='RESULT_VAR')
+parser.add_argument('-i', '--input', required=True, help='Folder of the dataset', metavar='DATASETS_PATH')
+# Results folder
+parser.add_argument('-r', '--result', default='results', help='Directory to store the results', metavar='RESULT_PATH')
+# Evaluation folder
+parser.add_argument('-e', '--evaluation', default='evalutations', help='Directory to store evaluation files', metavar='EVALUATION_PATH')
 # fake flag
-parser.add_argument('-f', dest='fake_flag', action='store_true', help='Print the command and not execute')
+parser.add_argument('-f', dest='fake_flag', action='store_true', help='Print the commands without executing them')
 parser.set_defaults(fake_flag=False)
 
 args = parser.parse_args()
 
 OPENMVG_SFM_BIN = args.software
 if not (os.path.exists(OPENMVG_SFM_BIN)):
-  print("/!\ Please update the OPENMVG_SFM_BIN to the openMVG_Build/software/SfM/ path.")
   print("Invalid path : " + OPENMVG_SFM_BIN)
   sys.exit(1)
 
 input_dir = args.input
+dir_results_base = args.result
+dir_eval_base = args.evaluation
 fake_flag = args.fake_flag
 if(fake_flag):
-  print "fake"
-if(args.fake_flag):
-  print "fake flag"
-# camera_calib   = args.calibration
-# voctree        = args.voctree
-# weights         = args.weights
-# output_file    = args.output
+  print "Fake flag activated. Nothing will be executed."
 
 # Run for each dataset of the input eval dir perform
 #  . localization
@@ -84,8 +68,6 @@ if(args.fake_flag):
 for scene in os.listdir(input_dir):
   scene_full = os.path.join(input_dir, scene)
 
-  # calibration file
-  file_calibration = os.path.join(scene_full, "camera.cal")
   # voctree + weights
   file_voctree = os.path.join(scene_full, "voctree.tree")
   file_weights = os.path.join(scene_full, "weights.weights")
@@ -100,19 +82,26 @@ for scene in os.listdir(input_dir):
   for move in os.listdir(os.path.join(scene_full, 'moves')):
     move_full = os.path.join(scene_full, 'moves', move)
 
+    # calibration file
+    file_calibration = os.path.join(move_full, 'camera.cal')
+
     # ground truth
     dir_gt = os.path.join(move_full, 'gt')
 
     # result directory
-    dir_results = os.path.join('results', scene, move)
+    dir_results = os.path.join(dir_results_base, scene, move)
     mkdir_p(dir_results)
+
+    # evaluation directory
+    dir_eval = os.path.join(dir_eval_base, scene, move)
+    mkdir_p(dir_eval)
 
     # for each image list we perform the tracking (SIFT or CCTAG or both, depending on option TODO)
     for image_list in os.listdir( os.path.join(move_full, 'lists') ):
       file_image_list = os.path.join(move_full, 'lists', image_list)
 
       # export file
-      file_export = os.path.join(dir_results, image_list + ".sift.abc")
+      file_export_sift = os.path.join(dir_results, image_list + ".sift.abc")
 
       # statistics of evalQuality
 
@@ -131,7 +120,7 @@ for scene in os.listdir(input_dir):
       print('file_reconstruction_cctag : ' + file_reconstruction_cctag )
       print('dir_gt                    : ' + dir_gt                    )
       print('file_image_list           : ' + file_image_list           )
-      print('file_export               : ' + file_export               )
+      print('file_export_sift          : ' + file_export_sift          )
 
       command = os.path.join(OPENMVG_SFM_BIN, "openMVG_main_voctreeLocalizer") + ' \\\n'
       command += " -c " + file_calibration + ' \\\n'
@@ -140,7 +129,7 @@ for scene in os.listdir(input_dir):
       command += " -d " + file_reconstruction_sift + ' \\\n'
       command += " -s " + dir_matching_sift + ' \\\n'
       command += " -m " + file_image_list + ' \\\n'
-      command += " -e " + file_export
+      command += " -e " + file_export_sift
 
       print ('The following command will be executed :')
       print ( command )
@@ -150,7 +139,7 @@ for scene in os.listdir(input_dir):
 
 
       # export file
-      file_export = os.path.join(dir_results, image_list + ".cctag.abc")
+      file_export_cctag = os.path.join(dir_results, image_list + ".cctag.abc")
 
       # final command for CCTAG
       command = os.path.join(OPENMVG_SFM_BIN, "openMVG_main_cctagLocalizer") + '\\\n'
@@ -158,7 +147,7 @@ for scene in os.listdir(input_dir):
       command += " -d " + file_reconstruction_cctag + ' \\\n'
       command += " -s " + dir_matching_cctag + ' \\\n'
       command += " -m " + file_image_list + ' \\\n'
-      command += " -e " + file_export
+      command += " -e " + file_export_cctag
 
       print ('The following command will be executed :')
       print ( command )
@@ -167,81 +156,33 @@ for scene in os.listdir(input_dir):
         proc.wait()
 
 
+      # ground truth evaluation
+      print ('SIFT and CCTag localizations are done. The ground truth evaluation will now perform :')
 
-# result_folder = {}
+      # for SIFT
+      print ('Evaluation for SIFT localization:')
+      command = os.path.join(OPENMVG_SFM_BIN, "openMVG_main_evalQuality") + '\\\n'
+      command += " -i " + dir_gt + '\\\n'
+      command += " -c " + file_export_sift + '\\\n'
+      command += " -o " + os.path.join(dir_eval, image_list + "_sift")
 
-# for image_list in os.listdir(input_dir):
+      print ('The following command will be executed :')
+      print ( command )
+      if(not fake_flag):
+        proc = subprocess.Popen((str(command)), shell=True)
+        proc.wait()
 
-#   print ("Localization")
-#   command = os.path.join(OPENMVG_SFM_BIN, "openMVG_main_voctreeLocalizer")
-#   command += " -c " + camera_calib
-#   command += " -t " + voctree
-#   command += " -w " + weights
-#   command += " -d " + "structure/sift/reconstruction/sfm_data.json"
-#   command += " -s " + "structure/sift/matching"
-#   command += " -m " + os.path.join(input_dir,image_list)
-#   command += " -e " + "results/" + image_list + ".sift.abc"
+      # for CCTAG
+      print ('Evaluation for CCTAG localization:')
+      command = os.path.join(OPENMVG_SFM_BIN, "openMVG_main_evalQuality") + '\\\n'
+      command += " -i " + dir_gt + '\\\n'
+      command += " -c " + file_export_cctag + '\\\n'
+      command += " -o " + os.path.join(dir_eval, image_list + "_cctag")
 
-#   print ("Executing : " + command)
-#   # proc = subprocess.Popen((str(command)), shell=True)
-#   # proc.wait()
-
-#   print ("Quality evaluation")
-#   command = os.path.join(OPENMVG_SFM_BIN, "openMVG_main_evalQuality")
-#   command = command + " -i " + "gt"
-#   command = command + " -c " + "results/" + image_list + ".sift.abc"
-#   command = command + " -o " + "stats/" + image_list + ".sift"
-#   print(command)
-#   proc = subprocess.Popen((str(command)), shell=True)
-#   proc.wait()
-
-# for directory in os.listdir(os.path.join(input_eval_dir, "medias")):
-
-#   full_directory = os.path.join(input_eval_dir,"medias",directory)
-#   print directory
-#   print full_directory
-
-
-#   print ("Localization")
-#   command = OPENMVG_SFM_BIN + "/openMVG_main_voctreeLocalizer"
-#   command += " -c " + camera_calib
-#   command += " -t " + voctree
-#   command += " -w " + weights
-#   command += " -d " + os.path.join(input_eval_dir, "reconstruction","sfm_data.json")
-#   command += " -s " + os.path.join(input_eval_dir, "matching")
-#   command += " -m " + full_directory
-#   print ("executing : " + command)
-#   proc = subprocess.Popen((str(command)), shell=True, stdout=subprocess.PIPE)
-#   cout, cerr = proc.communicate()
-#   print cout
-#   proc.wait()
-
-#   result = {}
-#   line = proc.stdout.readline()
-#   while line != '':
-#     if 'Baseline error statistics :' in line:
-#       basestats = {}
-#       line = proc.stdout.readline()
-#       line = proc.stdout.readline()
-#       for loop in range(0,4):
-#         basestats[line.rstrip().split(':')[0].split(' ')[1]] = float(line.rstrip().split(':')[1])
-#         line = proc.stdout.readline()
-#       result['Baseline error statistics'] = basestats
-#     if 'Angular error statistics :' in line:
-#       basestats = {}
-#       line = proc.stdout.readline()
-#       line = proc.stdout.readline()
-#       for loop in range(0,4):
-#         basestats[line.rstrip().split(':')[0].split(' ')[1]] = float(line.rstrip().split(':')[1])
-#         line = proc.stdout.readline()
-#       result['Angular error statistics'] = basestats
-#     line = proc.stdout.readline()
-
-#   result['time'] = time_folder
-#   result_folder[directory] = result
-
-# with open(args.result, 'w') as savejson:
-#     json.dump(result_folder, savejson, sort_keys=True, indent=4, separators=(',',':'))
-
+      print ('The following command will be executed :')
+      print ( command )
+      if(not fake_flag):
+        proc = subprocess.Popen((str(command)), shell=True, stdout=subprocess.PIPE)
+        proc.wait()
 
 sys.exit(0)
