@@ -40,9 +40,9 @@ def ensure_dir(f):
 parser = argparse.ArgumentParser(description='Run OpenMVG localization on several datasets to evaluate the localization according to a ground truth.')
 
 # OpenMVG SfM programs
-parser.add_argument('-s', '--software', required=True, help='OpenMVG SfM software folder ( like [...]/build/software/SfM)', metavar='SOFTWARE_PATH')
+parser.add_argument('-s', '--software', required=True, help='OpenMVG SfM software bin folder', metavar='SOFTWARE_PATH')
 # input folder where datasets are stored
-parser.add_argument('-i', '--input', required=True, help='Folder of the dataset)', metavar='DATASETS_PATH')
+parser.add_argument('-i', '--input', required=True, help='Folder of the dataset', metavar='DATASETS_PATH')
 # # camera calibration
 # parser.add_argument('-c', '--calibration', required=True, help='Camera calibration')
 # # voctree
@@ -52,9 +52,9 @@ parser.add_argument('-i', '--input', required=True, help='Folder of the dataset)
 # # Output file
 # parser.add_argument('-o', '--output', default='trackedcameras.abc', help='Ouput Alembic files containing estimated camera poses', metavar='RECONSTRUCTIONS_PATH')
 # Result file
-parser.add_argument('-r', '--result', default='results.json', help='File to store the results', metavar='RESULT_VAR')
+parser.add_argument('-r', '--result', default='results.json', help='Directory to store the results', metavar='RESULT_VAR')
 # fake flag
-parser.add_argument('-f', dest='fake_flag', action='store_true', help='Print the command and not execute')
+parser.add_argument('-f', dest='fake_flag', action='store_true', help='Print the commands without executing them')
 parser.set_defaults(fake_flag=False)
 
 args = parser.parse_args()
