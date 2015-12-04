@@ -69,7 +69,7 @@ input_dir = args.input
 fake_flag = args.fake_flag
 if(fake_flag):
   print "Fake flag activated. Nothing will be executed."
-  
+
 # camera_calib   = args.calibration
 # voctree        = args.voctree
 # weights         = args.weights
@@ -199,83 +199,5 @@ for scene in os.listdir(input_dir):
       if(not fake_flag):
         proc = subprocess.Popen((str(command)), shell=True, stdout=subprocess.PIPE)
         proc.wait()
-
-
-
-# result_folder = {}
-
-# for image_list in os.listdir(input_dir):
-
-#   print ("Localization")
-#   command = os.path.join(OPENMVG_SFM_BIN, "openMVG_main_voctreeLocalizer")
-#   command += " -c " + camera_calib
-#   command += " -t " + voctree
-#   command += " -w " + weights
-#   command += " -d " + "structure/sift/reconstruction/sfm_data.json"
-#   command += " -s " + "structure/sift/matching"
-#   command += " -m " + os.path.join(input_dir,image_list)
-#   command += " -e " + "results/" + image_list + ".sift.abc"
-
-#   print ("Executing : " + command)
-#   # proc = subprocess.Popen((str(command)), shell=True)
-#   # proc.wait()
-
-#   print ("Quality evaluation")
-#   command = os.path.join(OPENMVG_SFM_BIN, "openMVG_main_evalQuality")
-#   command = command + " -i " + "gt"
-#   command = command + " -c " + "results/" + image_list + ".sift.abc"
-#   command = command + " -o " + "stats/" + image_list + ".sift"
-#   print(command)
-#   proc = subprocess.Popen((str(command)), shell=True)
-#   proc.wait()
-
-# for directory in os.listdir(os.path.join(input_eval_dir, "medias")):
-
-#   full_directory = os.path.join(input_eval_dir,"medias",directory)
-#   print directory
-#   print full_directory
-
-
-#   print ("Localization")
-#   command = OPENMVG_SFM_BIN + "/openMVG_main_voctreeLocalizer"
-#   command += " -c " + camera_calib
-#   command += " -t " + voctree
-#   command += " -w " + weights
-#   command += " -d " + os.path.join(input_eval_dir, "reconstruction","sfm_data.json")
-#   command += " -s " + os.path.join(input_eval_dir, "matching")
-#   command += " -m " + full_directory
-#   print ("executing : " + command)
-#   proc = subprocess.Popen((str(command)), shell=True, stdout=subprocess.PIPE)
-#   cout, cerr = proc.communicate()
-#   print cout
-#   proc.wait()
-
-#   result = {}
-#   line = proc.stdout.readline()
-#   while line != '':
-#     if 'Baseline error statistics :' in line:
-#       basestats = {}
-#       line = proc.stdout.readline()
-#       line = proc.stdout.readline()
-#       for loop in range(0,4):
-#         basestats[line.rstrip().split(':')[0].split(' ')[1]] = float(line.rstrip().split(':')[1])
-#         line = proc.stdout.readline()
-#       result['Baseline error statistics'] = basestats
-#     if 'Angular error statistics :' in line:
-#       basestats = {}
-#       line = proc.stdout.readline()
-#       line = proc.stdout.readline()
-#       for loop in range(0,4):
-#         basestats[line.rstrip().split(':')[0].split(' ')[1]] = float(line.rstrip().split(':')[1])
-#         line = proc.stdout.readline()
-#       result['Angular error statistics'] = basestats
-#     line = proc.stdout.readline()
-
-#   result['time'] = time_folder
-#   result_folder[directory] = result
-
-# with open(args.result, 'w') as savejson:
-#     json.dump(result_folder, savejson, sort_keys=True, indent=4, separators=(',',':'))
-
 
 sys.exit(0)
